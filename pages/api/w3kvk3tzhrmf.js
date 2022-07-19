@@ -1,3 +1,5 @@
+import { clientPromise } from "../../util/mongodb";
+
 export default async function handler(req, res) {
   if (req.method != "GET") return;
 
@@ -6,9 +8,8 @@ export default async function handler(req, res) {
     const db = await client.db();
 
     const messages = await db.collection("messages").find({}).toArray();
-    console.log(messages);
 
-    res.status(200).json({ messages });
+    console.log("---------------------", messages);
 
     // const response = await fetch(
     //   //"https://platform.vestaboard.com/subscriptions/3fbe4044-e200-4f68-935f-9f6bae683077/message",
@@ -22,7 +23,7 @@ export default async function handler(req, res) {
     //   }
     // );
     // const vestaboard_response = await response.json();
-    // res.status(200).json({ vestaboard_response });
+    res.status(200).json(messages);
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "error loading messages" });

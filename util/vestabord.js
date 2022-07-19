@@ -169,6 +169,27 @@ export const charToCode = (rawChar) => {
     return 60;
   }
   if (char == "°") {
-    return 60;
+    return 62;
+  }
+  if (char == "$red") {
+    return 63;
+  }
+  if (char == "$orange") {
+    return 64;
+  }
+  if (char == "$yellow") {
+    return 65;
+  }
+  if (char == "$green") {
+    return 66;
+  }
+  if (char == "$blue") {
+    return 67;
+  }
+  if (char == "$purple") {
+    return 68;
+  }
+  if (char == "$white") {
+    return 69;
   }
 };
