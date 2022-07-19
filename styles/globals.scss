@@ -87,6 +87,9 @@ main{
   #red{
     background-color: red;
   }
+  #white{
+    background-color: white;
+  }
   #text{
     font-size: 1rem;
   }
@@ -147,6 +150,9 @@ main{
     }
     &.red{
       background-color: red;
+    }
+    &.white{
+      background-color: white;
     }
   }
 }
@@ -298,6 +304,9 @@ input[type=submit]{
       }
       &.red{
         background-color: red;
+      }
+      &.white{
+        background-color: white;
       }
     }}
     .controls{

@@ -298,6 +298,9 @@ export default function Home() {
             <button id="red" className={tool == "red" ? "selected" : ""}>
               Rosso
             </button>
+            <button id="white" className={tool == "white" ? "selected" : ""}>
+              Bianco
+            </button>
             <button id="text" className={tool == "text" ? "selected" : ""}>
               T
             </button>
