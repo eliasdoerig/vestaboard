@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Livello_1"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15">
+    <polygon points="11.64 4.98 10.81 13.25 4.19 13.25 3.36 4.98 11.64 4.98" style="fill:none; stroke:#fff; stroke-miterlimit:10; stroke-width:1px;"/>
+    <line x1="3.36" y1="2.91" x2="11.64" y2="2.91" style="fill:none; stroke:#fff; stroke-miterlimit:10; stroke-width:1px;"/>
+    <line x1="7.5" y1="2.91" x2="7.5" y2="1.25" style="fill:none; stroke:#fff; stroke-miterlimit:10; stroke-width:1px;"/>
+</svg>
