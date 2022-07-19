@@ -19,8 +19,8 @@ export default function Home() {
   const [timeInput, setTimeInput] = useState("");
   const [time, setTime] = useState([]);
   const [date, setDate] = useState({
-    dateFrom: undefined,
-    dateTo: undefined,
+    dateFrom: "",
+    dateTo: "",
   });
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_URL}/api/messages`)
@@ -161,7 +161,7 @@ export default function Home() {
     );
     setDaily(false);
     setTime([]);
-    setDate({ dateFrom: undefined, dateTo: undefined });
+    setDate({ dateFrom: "", dateTo: "" });
   };
 
   const handleSubmit = async (e) => {
@@ -172,10 +172,12 @@ export default function Home() {
       alert("you need to add a time");
       return;
     }
-    if (!daily || !date) {
+    if (!daily && (date.dateFrom == "" || date.dateTo == "")) {
       alert("you need to add a date or choos daily");
       return;
     }
+
+    console.log(date.dateFrom, date.dateFrom.split("-"));
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_URL}/api/messages`,

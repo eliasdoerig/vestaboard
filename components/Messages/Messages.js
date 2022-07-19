@@ -12,11 +12,9 @@ export default function Messages({ messages, handleActiv, handleRemove }) {
   }, [messages]);
 
   const printDate = (dateFrom, dateTo) => {
-    if (dateFrom === dateTo) {
-      return dateFrom;
-    } else {
-      return `${dateFrom} - ${dateTo}`;
-    }
+    const fromArr = dateFrom.split("-");
+    const toArr = dateTo.split("-");
+    return `${fromArr[2]}/${fromArr[1]}/${fromArr[0]}-${toArr[2]}/${toArr[1]}/${toArr[0]}`;
   };
 
   return (
