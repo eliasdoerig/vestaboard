@@ -354,6 +354,7 @@ export default function Home() {
                     <input
                       type="time"
                       id="time"
+                      step="900"
                       value={timeInput}
                       onChange={(e) => {
                         setTimeInput(e.target.value);

@@ -4,12 +4,12 @@ name: Check and send to Vestaboard CRON Schedule
 on:
   push:
     branches:
-    - master
+      - master
   schedule:
-    # Runs "every 5 min from 6.00-22.00" (see https://crontab.guru)
-    - cron: "*/5 4-19 * * *"
+    # Runs "every 15 min from 6.00-22.00" (see https://crontab.guru)
+    - cron: "*/15 4-19 * * *"
 jobs:
-  build:
+  check_messages:
     name: Check and send messages
     runs-on: ubuntu-latest
     steps:
