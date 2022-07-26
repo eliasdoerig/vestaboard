@@ -1,41 +1,43 @@
 import { clientPromise } from "../../util/mongodb";
 
 export default async function handler(req, res) {
-  if (req.method != "GET") return;
-
-  const time = timeToRoundedString();
-
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    res.status(405).end("Method Not Allowed");
+  }
   try {
-    const client = await clientPromise;
-    const db = await client.db();
-
-    const messages = await db.collection("messages").find({}).toArray();
-
-    const currentMessages = messages.filter((m) => m.time == time);
-    const messageToSend = filterMessageToSend(currentMessages);
-
-    // const response = await fetch(
-    //   //"https://platform.vestaboard.com/subscriptions/3fbe4044-e200-4f68-935f-9f6bae683077/message",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "X-Vestaboard-Api-Key": process.env.VESTABOARD_KEY,
-    //       "X-Vestaboard-Api-Secret": process.env.VESTABOARD_SECRET,
-    //     },
-    //     body: JSON.stringify({ characters: characters }),
-    //   }
-    // );
-    // const vestaboard_response = await response.json();
-    res
-      .status(200)
-      .json(
-        messageToSend
-          ? { m: messageToSend, t: time }
-          : { m: currentMessages, t: time }
-      );
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "error loading messages" });
+    const { authorization } = req.headers;
+    if (authorization === `Bearer ${process.env.API_SECRET_KEY}`) {
+      const client = await clientPromise;
+      const db = await client.db();
+      const time = timeToRoundedString();
+      const messages = await db
+        .collection("messages")
+        .find({ time: time })
+        .toArray();
+      const messageToSend = filterMessageToSend(messages);
+      if (messageToSend) {
+        const response = await fetch(process.env.VESTABORD_URL, {
+          method: "POST",
+          headers: {
+            "X-Vestaboard-Api-Key": process.env.VESTABOARD_KEY,
+            "X-Vestaboard-Api-Secret": process.env.VESTABOARD_SECRET,
+          },
+          body: JSON.stringify({ characters: messageToSend.code }),
+        });
+        const vestaboard_response = await response.json();
+        res.status(200).json({
+          success: true,
+          response: vestaboard_response,
+        });
+      } else {
+        res.status(200).json({ success: true, message: "No message" });
+      }
+    } else {
+      res.status(401).json({ statusCode: 401, success: false });
+    }
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: err.message });
   }
 }
 
