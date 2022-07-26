@@ -1,5 +1,5 @@
-# .github/workflows/scheduled-builds.yml
-name: Check and send messages on a CRON Schedule
+# .github/workflows/cron.yml
+name: Check and send to Vestaboard CRON Schedule
 
 on:
   schedule:
