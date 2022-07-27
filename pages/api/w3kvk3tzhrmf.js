@@ -43,7 +43,7 @@ export default async function handler(req, res) {
 }
 
 function timeToRoundedString(date = new Date()) {
-  const interval = 5;
+  const interval = 10;
   const ms = 1000 * 60 * interval;
   const time = new Date(Math.floor(date.getTime() / ms) * ms);
   const hours = `0${time.getHours()}`.slice(-2);
