@@ -11,6 +11,7 @@ export default async function handler(req, res) {
       const client = await clientPromise;
       const db = await client.db();
       const time = timeToRoundedString();
+      console.log("Cron job at:", time);
       const messages = await db
         .collection("messages")
         .find({ time: time })
