@@ -258,6 +258,13 @@ input[type=submit]{
 .planning{
   display: flex;
   flex-direction: column;
+  .subhead{
+    color: #999;
+    font-size: .55rem;
+    letter-spacing: .04rem;
+    margin-top: -.15rem;
+    margin-bottom: .35rem;
+  }
 }
 .messages{
   flex: 1;

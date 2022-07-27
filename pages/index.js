@@ -273,6 +273,7 @@ export default function Home() {
       <main>
         <div className="planning">
           <h2>TIMETABLE</h2>
+          <p className="subhead">10 MIN INTERVAL</p>
           <Messages
             messages={messages}
             handleActiv={handleActiv}
