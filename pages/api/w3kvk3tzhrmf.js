@@ -46,9 +46,13 @@ function timeToRoundedString(date = new Date()) {
   const interval = 10;
   const ms = 1000 * 60 * interval;
   const time = new Date(Math.floor(date.getTime() / ms) * ms);
-  const hours = `0${time.getHours()}`.slice(-2);
-  const minutes = `0${time.getMinutes()}`.slice(-2);
-  return `${hours}:${minutes}`;
+  const localTime = time.toLocaleTimeString([], {
+    timeZone: "Europe/Zurich",
+    hour12: false,
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return localTime;
 }
 
 function isDateInBetween(_from, _to) {
