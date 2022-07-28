@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         .toArray();
       const messageToSend = filterMessageToSend(messages);
       if (messageToSend) {
-        const response = await fetch(process.env.VESTABORD_URL, {
+        const response = await fetch(process.env.VESTABOARD_URL, {
           method: "POST",
           headers: {
             "X-Vestaboard-Api-Key": process.env.VESTABOARD_KEY,
@@ -27,12 +27,14 @@ export default async function handler(req, res) {
           body: JSON.stringify({ characters: messageToSend.code }),
         });
         const vestaboard_response = await response.json();
+        console.log(vestaboard_response);
         res.status(200).json({
           success: true,
           response: vestaboard_response,
         });
       } else {
         res.status(200).json({ success: true, message: "No message" });
+        console.log("no message");
       }
     } else {
       res.status(401).json({ statusCode: 401, success: false });
