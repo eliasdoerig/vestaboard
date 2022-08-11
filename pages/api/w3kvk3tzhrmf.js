@@ -13,8 +13,16 @@ export default async function handler(req, res) {
       const time = timeToRoundedString();
       console.log("Cron job at:", time);
       const messages = await db
-        .collection("messages")
-        .find({ time: time })
+        .collection(process.env.MONGODB_DATABASE)
+        .aggregate([
+          {
+            $match: {
+              times: {
+                $elemMatch: { time: { $gte: time }, activ: { $gte: true } },
+              },
+            },
+          },
+        ])
         .toArray();
       const messageToSend = filterMessageToSend(messages);
       if (messageToSend) {
@@ -68,11 +76,10 @@ function filterMessageToSend(messages) {
   let messageToSend = null;
   let found = false;
   messages.forEach((message) => {
-    if (message.daily && message.activ && !found) {
+    if (message.daily && !found) {
       messageToSend = message;
     } else if (
       !message.daily &&
-      message.activ &&
       isDateInBetween(message.date.dateFrom, message.date.dateTo)
     ) {
       messageToSend = message;

@@ -8,6 +8,7 @@ export default function Home() {
 
   //current board
   const [tool, setTool] = useState("text");
+  const [currentId, setCurrentID] = useState(null);
   const charRows = 6;
   const charCols = 22;
   const [characters, setCharacters] = useState(
@@ -27,6 +28,12 @@ export default function Home() {
       .then((res) => res.json())
       .then((data) => setMessages(data));
   }, [change]);
+
+  const changeChar = (row, char, value) => {
+    let copy = [...characters];
+    copy[row][char] = value;
+    setCharacters(copy);
+  };
 
   const handleKeyDown = (e) => {
     const currentRow = parseInt(e.target.getAttribute("row"));
@@ -89,12 +96,6 @@ export default function Home() {
     }
   };
 
-  const changeChar = (row, char, value) => {
-    let copy = [...characters];
-    copy[row][char] = value;
-    setCharacters(copy);
-  };
-
   const handlePaste = (e) => {
     let currentRow = parseInt(e.target.getAttribute("row"));
     let currentChar = parseInt(e.target.getAttribute("char"));
@@ -119,7 +120,7 @@ export default function Home() {
     });
   };
 
-  const addTime = (e) => {
+  const formAddTime = (e) => {
     e.preventDefault();
     const re = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
     if (time.indexOf(timeInput) == -1 && re.exec(timeInput)) {
@@ -128,7 +129,7 @@ export default function Home() {
     }
   };
 
-  const removeTime = (e) => {
+  const formRemoveTime = (e) => {
     if (e.target.tagName !== "SPAN") return;
     const value = e.target.parentNode.getAttribute("data-time");
     setTime(time.filter((t) => t !== value));
@@ -153,7 +154,16 @@ export default function Home() {
     }
   };
 
+  const handleTools = (e) => {
+    const selectedTool = e.target.id;
+    if (selectedTool) {
+      setTool(selectedTool);
+    }
+    console.log(tool);
+  };
+
   const resetBoard = () => {
+    setCurrentID(null);
     setCharacters(
       Array(charRows)
         .fill("")
@@ -190,6 +200,7 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          _id: currentId,
           chars: characters,
           time: time,
           date: date,
@@ -206,8 +217,12 @@ export default function Home() {
     setchange((change) => !change);
   };
 
-  const handleActiv = async (id, activ) => {
+  const handleActiv = async (id, times, time, activ) => {
     console.log("change", id);
+    const updatedTimes = times.map((t) => {
+      return t.time === time ? { ...t, activ: activ } : { ...t };
+    });
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_URL}/api/messages/${id}`,
       {
@@ -218,7 +233,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ activ: activ }),
+        body: JSON.stringify({ times: updatedTimes }),
       }
     );
     const data = await response.json();
@@ -227,39 +242,76 @@ export default function Home() {
     setchange((change) => !change);
   };
 
-  const handleRemove = async (id) => {
-    console.log("remove", id);
+  const handleRemoveTime = async (id, times, time) => {
     if (
-      window.confirm(`Do you really want to remove ${id} from the collection?`)
+      window.confirm(
+        `Do you really want to remove ${id} at ${time} from the collection?`
+      )
     ) {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/messages/${id}`,
-        {
-          method: "DELETE",
-          mode: "cors",
-          cache: "no-cache",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({}),
-        }
-      );
-      const data = await response.json();
-      console.log(data);
-
+      //update if there are more than 1 entry else remove message
+      if (times.length > 1) {
+        const updatedTimes = times.filter((t) => t.time !== time);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/messages/${id}`,
+          {
+            method: "PUT",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ times: updatedTimes }),
+          }
+        );
+        const data = await response.json();
+        console.log(data);
+      } else {
+        handleRemove(id);
+      }
       setchange((change) => !change);
     } else {
       console.log("Exit remove");
     }
   };
 
-  const handleTools = (e) => {
-    const selectedTool = e.target.id;
-    if (selectedTool) {
-      setTool(selectedTool);
+  const handleRemove = async (id) => {
+    console.log("remove", id);
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/messages/${id}`,
+      {
+        method: "DELETE",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: id }),
+      }
+    );
+
+    const data = await response.json();
+    console.log(data);
+
+    if (currentId === id) {
+      resetBoard();
     }
-    console.log(tool);
+
+    setchange((change) => !change);
+  };
+
+  const handleEdit = async (id) => {
+    const messageToEdit = messages.find((m) => m._id == id);
+    setCharacters(messageToEdit.chars);
+    setTime(messageToEdit.times.map((t) => t.time));
+    setCurrentID(messageToEdit._id);
+    setDate({
+      dateFrom: messageToEdit.date.dateFrom,
+      dateTo: messageToEdit.date.dateTo,
+    });
+    setDaily(messageToEdit.daily);
   };
 
   return (
@@ -277,11 +329,21 @@ export default function Home() {
           <Messages
             messages={messages}
             handleActiv={handleActiv}
-            handleRemove={handleRemove}
+            handleRemove={handleRemoveTime}
+            handleEdit={handleEdit}
           />
         </div>
         <div>
           <h1>VESTABOARD</h1>
+          {currentId && (
+            <>
+              <p className="subhead">Message id: {currentId}</p>
+              <button className="subhead-btn" onClick={resetBoard}>
+                new message
+              </button>
+            </>
+          )}
+
           <div className="tools" onClick={handleTools}>
             <button id="orange" className={tool == "orange" ? "selected" : ""}>
               Arancione
@@ -362,7 +424,7 @@ export default function Home() {
                       }}
                     />
                   </label>
-                  <button onClick={addTime}>+</button>
+                  <button onClick={formAddTime}>+</button>
                 </div>
                 <div className="time-display">
                   {time?.map((t, i) => {
@@ -371,7 +433,7 @@ export default function Home() {
                         className="time"
                         key={i}
                         data-time={t}
-                        onClick={removeTime}
+                        onClick={formRemoveTime}
                       >
                         {t} <span>×</span>
                       </div>

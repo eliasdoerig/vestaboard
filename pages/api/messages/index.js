@@ -8,7 +8,10 @@ export default async function handler(req, res) {
       const client = await clientPromise;
       const db = await client.db();
 
-      const data = await db.collection("messages").find({}).toArray();
+      const data = await db
+        .collection(process.env.MONGODB_DATABASE)
+        .find({})
+        .toArray();
 
       res.status(200).json(data);
     } catch (e) {
@@ -28,19 +31,24 @@ export default async function handler(req, res) {
     try {
       const client = await clientPromise;
       const db = await client.db();
+      const id = new ObjectId(message._id);
 
-      const data = await db.collection("messages").insertMany(
-        message.time.map((t) => {
-          return {
+      const data = await db.collection(process.env.MONGODB_DATABASE).updateOne(
+        { _id: id },
+        {
+          $set: {
             chars: message.chars,
             code: code,
             type: message.type,
-            activ: true,
-            time: t,
+            times: message.time.map((time) => ({
+              time: time,
+              activ: true,
+            })),
             date: message.date,
             daily: message.daily,
-          };
-        })
+          },
+        },
+        { upsert: true }
       );
 
       res.status(200).json(data);

@@ -1,11 +1,23 @@
 import { useEffect, useState } from "react";
 
-export default function Messages({ messages, handleActiv, handleRemove }) {
+export default function Messages({
+  messages,
+  handleActiv,
+  handleRemove,
+  handleEdit,
+}) {
   const [orderedMessages, setOrderedMessages] = useState();
 
   useEffect(() => {
     if (!messages) return;
-    const messagesByTime = messages.sort(function (a, b) {
+    let messagesSplitTime = [];
+    messages.forEach((m) => {
+      m.times.forEach((t) => {
+        messagesSplitTime.push({ ...m, time: t.time, activ: t.activ });
+      });
+    });
+    console.log(messagesSplitTime);
+    const messagesByTime = messagesSplitTime.sort(function (a, b) {
       return a.time > b.time ? 1 : a.time < b.time ? -1 : 0;
     });
     setOrderedMessages(messagesByTime);
@@ -20,9 +32,9 @@ export default function Messages({ messages, handleActiv, handleRemove }) {
   return (
     <ul className="messages">
       {orderedMessages ? (
-        orderedMessages?.map((message) => {
+        orderedMessages?.map((message, i) => {
           return (
-            <li key={message._id} className={message.activ ? "" : "disabled"}>
+            <li key={i} className={message.activ ? "" : "disabled"}>
               {message.chars?.map((line, i) => {
                 return (
                   <p key={i}>
@@ -39,14 +51,26 @@ export default function Messages({ messages, handleActiv, handleRemove }) {
               <div className="controls">
                 <button
                   onClick={() => {
-                    handleRemove(message._id);
+                    handleEdit(message._id);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => {
+                    handleRemove(message._id, message.times, message.time);
                   }}
                 >
                   Remove
                 </button>
                 <button
                   onClick={() => {
-                    handleActiv(message._id, !message.activ);
+                    handleActiv(
+                      message._id,
+                      message.times,
+                      message.time,
+                      !message.activ
+                    );
                   }}
                 >
                   {message.activ ? "Disable" : "Enable"}
