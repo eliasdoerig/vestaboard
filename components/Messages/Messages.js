@@ -23,11 +23,18 @@ export default function Messages({
     setOrderedMessages(messagesByTime);
   }, [messages]);
 
-  const printDate = (dateFrom, dateTo) => {
-    const fromArr = dateFrom.split("-");
-    const toArr = dateTo.split("-");
+  const printDate = (_from, _to) => {
+    const fromArr = _from.split("-");
+    const toArr = _to.split("-");
     return `${fromArr[2]}/${fromArr[1]}/${fromArr[0]}-${toArr[2]}/${toArr[1]}/${toArr[0]}`;
   };
+
+  function isDateInBetween(_from, _to) {
+    const check = new Date();
+    const from = Date.parse(`${_from}T00:00Z`);
+    const to = Date.parse(`${_to}T23:59Z`);
+    return check >= from && check <= to;
+  }
 
   return (
     <ul className="messages">

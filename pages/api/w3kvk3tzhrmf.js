@@ -25,6 +25,7 @@ export default async function handler(req, res) {
         ])
         .toArray();
       const messageToSend = filterMessageToSend(messages);
+      console.log("message: ", messageToSend);
       if (messageToSend) {
         const response = await fetch(process.env.VESTABOARD_URL, {
           method: "POST",
@@ -40,6 +41,7 @@ export default async function handler(req, res) {
           success: true,
           response: vestaboard_response,
         });
+        console.log("message to vestaboard");
       } else {
         res.status(200).json({ success: true, message: "No message" });
         console.log("no message");
