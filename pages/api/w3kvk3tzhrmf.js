@@ -14,15 +14,7 @@ export default async function handler(req, res) {
       console.log("Cron job at:", time);
       const messages = await db
         .collection(process.env.MONGODB_DATABASE)
-        .aggregate([
-          {
-            $match: {
-              times: {
-                $elemMatch: { time: { $gte: time }, activ: { $gte: true } },
-              },
-            },
-          },
-        ])
+        .find({ times: { $elemMatch: { time: time, activ: true } } })
         .toArray();
       const messageToSend = filterMessageToSend(messages);
       console.log("message: ", messageToSend);
